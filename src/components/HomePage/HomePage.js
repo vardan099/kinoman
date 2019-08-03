@@ -3,17 +3,16 @@ import PropTypes from "prop-types";
 import {bindActionCreators} from "redux";
 import ReactPaginate from 'react-paginate';
 import {connect} from "react-redux";
-import axios from 'axios/index';
 import MoviesWrapper from '../MoviesWrapper/MoviesWrapper';
 import Header from '../Header/Header';
 import SearchInput from '../SearchInput/SearchInput';
-import config from '../../config/config'
 import Loader from 'react-loader-spinner'
 import NoResults from '../../components/NoResults/NoResults'
 import ModalWrapper from '../ModalWrapper/ModalWrapper'
 import * as favoriteActions from "../../actions/favoriteActions";
 import * as watchLaterActions from "../../actions/watchLaterActions";
 import SweetAlert from 'react-bootstrap-sweetalert';
+import { getMovies , searchMovies , getMovieTrailer} from "../../services/MoviesService";
 
 
 class HomePage extends Component {
@@ -38,54 +37,54 @@ class HomePage extends Component {
         };
     }
 
-    loadMoviesFromServer(page) {
-        axios.get(`${config.DISCOVER_URL}?api_key=${config.API_KEY}&sort_by=popularity.desc&page=${page}`).then((response) => {
+     async loadMoviesFromServer(page) {
+         try {
+             const response =  await getMovies(page);
+             const movies = response.data.results;
+             const total_pages = response.data.total_pages > 1000 ? 1000 : response.data.total_pages;
+             this.setState({
+                 movies,
+                 total_pages,
+                 loading: false,
+                 isHome: true,
+                 query: '',
+                 activeSection: 'home'
+             })
+         }
+         catch(error) {
+             throw new Error(error)
+         }
+    }
+
+    async searchMoviesFromServer(page, query) {
+        try {
+           const response = await searchMovies(page,query);
             const movies = response.data.results;
             const total_pages = response.data.total_pages > 1000 ? 1000 : response.data.total_pages;
             this.setState({
                 movies,
                 total_pages,
                 loading: false,
-                isHome: true,
-                query: '',
-                activeSection: 'home'
+                isHome: true
             })
-        }).catch(function (error) {
-            // handle error
-            console.log(error);
-        })
-    }
-    searchMoviesFromServer(page, query) {
-        if (query !== "") {
-            axios.get(`${config.SEARCH_URL}?api_key=${config.API_KEY}&query=${query}&page=${page}`).then((response) => {
-                const movies = response.data.results;
-                const total_pages = response.data.total_pages > 1000 ? 1000 : response.data.total_pages;
-                this.setState({
-                    movies,
-                    total_pages,
-                    loading: false,
-                    isHome: true
-                })
-            }).catch(function (error) {
-                // handle error
-                console.log(error);
-            })
+        }catch (error) {
+            throw new Error(error)
         }
     }
 
-    getMovieTrailerFromServer(videoId) {
-        axios.get(`${config.MOVIE_URL}/${videoId}/videos?api_key=${config.API_KEY}`).then((response) => {
-            const results = response.data.results;
-            if (results.length > 0) {
-                const videoKey = results[0].key;
-                this.setState({
-                    videoKey,
-                })
-            }
-        }).catch(function (error) {
-            // handle error
-            console.log(error);
-        })
+     async getMovieTrailerFromServer(videoId) {
+         try {
+             const response = await getMovieTrailer(videoId);
+             const results = response.data.results;
+             if (results.length > 0) {
+                 const videoKey = results[0].key;
+                 this.setState({
+                     videoKey,
+                 })
+             }
+         }catch (error) {
+             throw new Error(error)
+         }
     }
 
     componentDidMount() {

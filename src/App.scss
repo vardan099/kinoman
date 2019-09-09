@@ -119,11 +119,14 @@ i.orange-star {
       p:nth-child(3) i:nth-child(1):hover{
         color: #1696e5;
       }
-      p:nth-child(3) i:nth-child(2):hover{
+      p:nth-child(3) i:nth-child(2):hover, p:nth-child(3) i:nth-child(2).active{
         color: #ff9d00;
       }
       p:nth-child(3) i:nth-child(3):hover{
         color: gray;
+      }
+      p:nth-child(3) i:nth-child(3).active{
+        color: #ff9d00;
       }
       figcaption {
         text-align: left;

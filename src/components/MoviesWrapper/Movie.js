@@ -4,30 +4,24 @@ import {useSelector} from 'react-redux'
 import Img from 'react-image'
 import Loader from 'react-loader-spinner'
 import config from '../../config/config'
+import { EXIST_IN_FAWORITES, EXIST_IN_WATCH_LATTER } from '../../constants/alert-messages'
 
 const Movie = (props) => {
     const {movie, index, addToWatchLaterCallback, watchTrailerCallback, addToFavoritesCallback, showAlertCallback} = props;
     const favorites = useSelector(state => state.favorites);
     const watchLater = useSelector(state => state.watchLater);
     const imagePath = movie.poster_path ? `${config.IMAGE_URL}/${movie.poster_path}` : `${process.env.PUBLIC_URL}/noposter.png`;
+    const isMovieInFavorites = favorites.favoritesList.findIndex((e) => e.id === movie.id) !== -1;
+    const isMovieInWatchLatter = watchLater.watchLaterList.findIndex((e) => e.id === movie.id) !== -1;
+    const iconClasses = "fa fa-fw display-4 pointer";
 
 
     const addToFavorites = (movie) => {
-        const index = favorites.favoritesList.findIndex((e) => e.id === movie.id);
-        if (index === -1) {
-            addToFavoritesCallback(movie)
-        } else {
-            showAlertCallback('info', 'The movie already exist in favorite list')
-        }
+        isMovieInFavorites ? showAlertCallback('info', EXIST_IN_FAWORITES) : addToFavoritesCallback(movie);
     };
 
     const addToWatchLater = (movie) => {
-        const index = watchLater.watchLaterList.findIndex((e) => e.id === movie.id);
-        if (index === -1) {
-            addToWatchLaterCallback(movie)
-        } else {
-            showAlertCallback('info', 'The movie already exist in watch latter list')
-        }
+        isMovieInWatchLatter ? showAlertCallback('info', EXIST_IN_WATCH_LATTER) : addToWatchLaterCallback(movie);
     };
     return (
         <div className="col-lg-3 col-md-4 col-sm-6 movie" key={index} data-test="movieComponent">
@@ -52,12 +46,10 @@ const Movie = (props) => {
                                 <i className="fa fa-fw fa-play display-4 pointer" onClick={() => {
                                     watchTrailerCallback(movie)
                                 }}/>
-                                <i className="fa fa-fw fa-star-o display-4 pointer" onClick={() => {
-                                    addToFavorites(movie)
-                                }}/>
-                                <i className="fa fa-fw fa-clock-o display-4 pointer" onClick={() => {
-                                    addToWatchLater(movie)
-                                }}/>
+                                <i className={isMovieInFavorites ? `${iconClasses} fa-star active`: `${iconClasses} fa-star-o`}
+                                   onClick={() => {addToFavorites(movie)}}/>
+                                <i className={isMovieInWatchLatter ? `${iconClasses} fa-clock-o active`: `${iconClasses} fa-clock-o`}
+                                   onClick={() => {addToWatchLater(movie)}}/>
                             </p>
                         </figcaption>
                     </figure>

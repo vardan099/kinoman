@@ -14,6 +14,8 @@ import * as watchLaterActions from "../../actions/watchLaterActions";
 import SweetAlert from 'react-bootstrap-sweetalert';
 import { getMovies , searchMovies , getMovieTrailer} from "../../services/MoviesService";
 
+import { ADDED_TO_FAVORITES, ADDED_TO_WATCH_LATTER } from "../../constants/alert-messages"
+
 
 class HomePage extends Component {
 
@@ -105,13 +107,13 @@ class HomePage extends Component {
     watchLater = movie => {
         const {watchLaterActions} = this.props;
         watchLaterActions.addToWatchLater(movie);
-        this.showAlert('success', 'The movie added to the watch later list')
+        this.showAlert('success', ADDED_TO_WATCH_LATTER)
     };
 
     addToFavorites = movie => {
         const {favoriteActions} = this.props;
         favoriteActions.addToFavorites(movie);
-        this.showAlert('success', 'The movie added to the favorite list')
+        this.showAlert('success', ADDED_TO_FAVORITES)
     };
 
     watchTrailer = movie => {
